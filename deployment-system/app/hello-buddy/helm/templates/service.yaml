@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Release.Name }}-hello-buddy
+  labels:
+    app: hello-buddy
+    release: {{ .Release.Name }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - port: {{ .Values.service.port }}
+      targetPort: 80
+  selector:
+    app: hello-buddy
+    release: {{ .Release.Name }}

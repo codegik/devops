@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-hello-buddy
+  labels:
+    app: hello-buddy
+    release: {{ .Release.Name }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: hello-buddy
+      release: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app: hello-buddy
+        release: {{ .Release.Name }}
+    spec:
+      containers:
+        - name: hello-buddy
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - containerPort: 80
+          resources: {{- toYaml .Values.resources | nindent 12 }}

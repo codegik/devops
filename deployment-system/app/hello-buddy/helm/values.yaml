@@ -1,0 +1,12 @@
+replicaCount: 2
+
+image:
+  repository: hello-buddy
+  tag: latest
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 80
+
+resources: {}
