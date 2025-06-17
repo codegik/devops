@@ -15,5 +15,12 @@ kind create cluster
 export OPENTOFU_ENFORCE_GPG_VALIDATION=false
 cd iac/src
 tofu init
+tofu apply
 ```
 
+## Build the App
+```bash
+cd app/hello-buddy
+npm install
+docker build -t hello-buddy:latest .
+```
