@@ -1,15 +1,20 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ .Release.Name }}-hello-buddy
+  name: {{ .Chart.Name }}
+  namespace: {{ .Values.namespace }}
   labels:
-    app: hello-buddy
-    release: {{ .Release.Name }}
+    app: {{ .Chart.Name }}
+    release: {{ .Chart.Name }}
+#  annotations:
+#    prometheus.io/scrape: "true"
+#    prometheus.io/port: "{{ .Values.containerPort }}"
+#    prometheus.io/path: "/metrics"
 spec:
   type: {{ .Values.service.type }}
   ports:
     - port: {{ .Values.service.port }}
-      targetPort: 80
+      targetPort: {{ .Values.containerPort }}
   selector:
-    app: hello-buddy
-    release: {{ .Release.Name }}
+    app: {{ .Chart.Name }}
+    release: {{ .Chart.Name }}

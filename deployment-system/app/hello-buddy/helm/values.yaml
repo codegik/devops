@@ -1,4 +1,5 @@
 replicaCount: 2
+namespace: app
 
 image:
   repository: hello-buddy
@@ -9,4 +10,4 @@ service:
   type: ClusterIP
   port: 80
 
-resources: {}
+containerPort: 8000
