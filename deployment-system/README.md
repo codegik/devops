@@ -1,13 +1,11 @@
 
 ## Requirements
 - OpenTofu
-- Colima
 - Kind
 
 ## Startup the cluster
 ```bash
-export KIND_EXPERIMENTAL_PROVIDER=colima
-kind create cluster
+kind create cluster --config kind-config.yaml
 ```
 
 ## Build the Infra

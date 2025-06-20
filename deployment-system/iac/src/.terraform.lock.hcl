@@ -5,7 +5,6 @@ provider "registry.opentofu.org/hashicorp/helm" {
   version     = "3.0.0-pre2"
   constraints = "3.0.0-pre2"
   hashes = [
-    "h1:3xDLmpoU0RWowxJhSNlTR0Fi/6veA8TzhR+xZwJ+Xa0=",
     "h1:9thP25mY/sjK/OtTz3E+g4pumoFa7JVsOD5VUiuBYrc=",
     "zh:1c3a224a852c64bb8c8e0652e7770c61d519be66ee9b43ebddfa1f9f64e6e151",
     "zh:2200e69ed1aec5eb81d3d6dfaa9d3320ff1c7711decdb7541f85ef8d58137061",
@@ -25,7 +24,6 @@ provider "registry.opentofu.org/hashicorp/kubernetes" {
   constraints = "2.37.1"
   hashes = [
     "h1:/NV0D0ajptwUiD5E2gXqwGBx9Currf8sGZOSgP6RRvc=",
-    "h1:UWJPvQZxW9Q6mxtUvIdnapPE8s8o4a2HUo53OInq9p4=",
     "zh:22031e9995b3dc7ae497305dc6c5b7bf1a585c378d46446e724601f992cd9e11",
     "zh:3614bc188ae5040d892671009c66f56cfcb3859e11f42ed7ffc1cee384b1275b",
     "zh:5d925944ac961bbe5fb4917a3e7e6d9bc0bef2f3198f26e8d4cd1793d5eadde3",
