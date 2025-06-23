@@ -9,6 +9,9 @@ nodes:
   - containerPort: 30300 # Prometheus
     hostPort: 30300
     protocol: TCP
+  - containerPort: 30500 # Jenkins
+    hostPort: 30500
+    protocol: TCP
   - containerPort: 30600 # Jenkins
     hostPort: 30600
     protocol: TCP

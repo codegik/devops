@@ -1,0 +1,82 @@
+pipeline {
+    agent any
+
+    environment {
+        APP_NAME = 'hello-buddy'
+        DOCKER_REGISTRY = 'localhost:30500'
+        NAMESPACE = 'app'
+        HELM_CHART_PATH = './helm'
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+
+        stage('Run Tests') {
+            steps {
+                dir('app/hello-buddy') {
+                    sh 'npm install'
+                    sh 'npm test'
+                }
+            }
+            post {
+                failure {
+                    error "Tests failed! Aborting the pipeline."
+                }
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                dir('app/hello-buddy') {
+                    sh "docker build -t ${DOCKER_REGISTRY}/${APP_NAME}:${BUILD_NUMBER} ."
+                }
+            }
+        }
+
+        stage('Push to Registry') {
+            steps {
+                sh "docker push ${DOCKER_REGISTRY}/${APP_NAME}:${BUILD_NUMBER}"
+            }
+        }
+
+        stage('Update Helm Values') {
+            steps {
+                dir('app/hello-buddy') {
+                    // Update the Helm values.yaml file with the new image tag
+                    sh """
+                    sed -i 's|tag: .*|tag: ${BUILD_NUMBER}|g' ${HELM_CHART_PATH}/values.yaml
+                    sed -i 's|repository: .*|repository: ${DOCKER_REGISTRY}/${APP_NAME}|g' ${HELM_CHART_PATH}/values.yaml
+                    """
+                }
+            }
+        }
+
+        stage('Deploy with Helm') {
+            steps {
+                dir('app/hello-buddy') {
+                    sh "helm upgrade --install ${APP_NAME} ${HELM_CHART_PATH} --namespace ${NAMESPACE} --create-namespace"
+                }
+            }
+        }
+
+        stage('Verify Deployment') {
+            steps {
+                sh "kubectl rollout status deployment/${APP_NAME} -n ${NAMESPACE}"
+                sh "kubectl get pods -l app=${APP_NAME} -n ${NAMESPACE}"
+            }
+        }
+    }
+
+    post {
+        success {
+            echo "Deployment of ${APP_NAME} completed successfully!"
+        }
+        failure {
+            echo "Deployment of ${APP_NAME} failed!"
+        }
+    }
+}

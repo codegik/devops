@@ -37,6 +37,8 @@ resource "helm_release" "grafana" {
   chart      = "grafana"
   namespace  = kubernetes_namespace.iac.metadata[0].name
   timeout    = 600
+  values     = [file("../resources/grafana.yml")]
+  depends_on = [helm_release.prometheus]
   set        = [
     {
       name  = "service.type"
@@ -47,9 +49,6 @@ resource "helm_release" "grafana" {
       value = "30400"
     }
   ]
-  # Configure Grafana with Prometheus datasource
-  values     = [file("../resources/grafana.yml")]
-  depends_on = [helm_release.prometheus]
 }
 
 
@@ -79,6 +78,7 @@ resource "helm_release" "jenkins" {
   chart      = "jenkins"
   namespace  = kubernetes_namespace.iac.metadata[0].name
   timeout    = 900
+  values     = [file("../resources/jenkins.yml")]
   set        = [
     {
       name  = "controller.serviceType"
@@ -94,3 +94,4 @@ resource "helm_release" "jenkins" {
     }
   ]
 }
+
