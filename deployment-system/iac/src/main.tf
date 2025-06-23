@@ -18,7 +18,6 @@ resource "helm_release" "prometheus" {
   chart      = "prometheus"
   namespace  = kubernetes_namespace.iac.metadata[0].name
   timeout    = 900 # Increase timeout to 15 minutes
-
   set        = [
     {
       name  = "server.service.type"
@@ -87,10 +86,6 @@ resource "helm_release" "jenkins" {
     },
     {
       name  = "controller.servicePort"
-      value = "8080"
-    },
-    {
-      name  = "controller.targetPort"
       value = "8080"
     },
     {
