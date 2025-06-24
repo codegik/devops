@@ -77,7 +77,7 @@ resource "helm_release" "jenkins" {
   repository = "https://charts.jenkins.io"
   chart      = "jenkins"
   namespace  = kubernetes_namespace.iac.metadata[0].name
-  timeout    = 900
+  timeout    = 1800
   values     = [file("../resources/jenkins.yml")]
   set        = [
     {
