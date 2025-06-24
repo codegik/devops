@@ -117,12 +117,9 @@ resource "helm_release" "jenkins" {
                               url('https://github.com/codegik/devops.git')
                             }
                             branch('*/master')
-                            extensions {
-                              relativeTargetDirectory('deployment-system/app/hello-buddy')
-                            }
                           }
                         }
-                        scriptPath('Jenkinsfile')
+                        scriptPath('deployment-system/app/hello-buddy/Jenkinsfile')
                       }
                     }
                   }
@@ -132,41 +129,7 @@ resource "helm_release" "jenkins" {
         - workflow-aggregator:latest
         - job-dsl:latest
         - configuration-as-code:latest
+        - docker-workflow:latest
     EOT
   ]
 }
-
-
-# resource "kubernetes_config_map" "jenkins_seed_job" {
-#   metadata {
-#     name      = "jenkins-seed-job"
-#     namespace = kubernetes_namespace.iac.metadata[0].name
-#   }
-#
-#   data = {
-#     "seed-job.groovy" = <<-EOT
-#       pipelineJob('hello-buddy') {
-#         definition {
-#           cpsScm {
-#             scm {
-#               git {
-#                 remote {
-#                   url('https://github.com/codegik/devops.git')
-#                 }
-#                 branch('*/master')
-#                 extensions {
-#                   relativeTargetDirectory('deployment-system/hello-buddy')
-#                 }
-#               }
-#             }
-#             scriptPath('Jenkinsfile')
-#           }
-#         }
-#       }
-#     EOT
-#   }
-# }
-
-
-
-
