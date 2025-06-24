@@ -9,15 +9,9 @@ pipeline {
     }
 
     stages {
-        stage('Checkout') {
-            steps {
-                checkout scm
-            }
-        }
-
         stage('Run Tests') {
             steps {
-                dir('app/hello-buddy') {
+                dir('deployment-system/app/hello-buddy') {
                     sh 'npm install'
                     sh 'npm test'
                 }

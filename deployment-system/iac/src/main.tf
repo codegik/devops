@@ -77,8 +77,7 @@ resource "helm_release" "jenkins" {
   repository = "https://charts.jenkins.io"
   chart      = "jenkins"
   namespace  = kubernetes_namespace.iac.metadata[0].name
-  timeout    = 1800
-  values     = [file("../resources/jenkins.yml")]
+  timeout    = 1800 # Increase timeout to 30 minutes
   set        = [
     {
       name  = "controller.serviceType"
@@ -93,5 +92,81 @@ resource "helm_release" "jenkins" {
       value = "30600"
     }
   ]
+  values    = [
+    <<-EOT
+    controller:
+      serviceType: NodePort
+      servicePort: 8080
+      nodePort: 30600
+
+      JCasC:
+        configScripts:
+          jobs: |
+            jobs:
+              - script: >
+                  folder('devops') {
+                    description('DevOps Jobs')
+                  }
+              - script: >
+                  pipelineJob('devops/hello-buddy') {
+                    definition {
+                      cpsScm {
+                        scm {
+                          git {
+                            remote {
+                              url('https://github.com/codegik/devops.git')
+                            }
+                            branch('*/master')
+                            extensions {
+                              relativeTargetDirectory('deployment-system/app/hello-buddy')
+                            }
+                          }
+                        }
+                        scriptPath('Jenkinsfile')
+                      }
+                    }
+                  }
+
+      installPlugins:
+        - git:latest
+        - workflow-aggregator:latest
+        - job-dsl:latest
+        - configuration-as-code:latest
+    EOT
+  ]
 }
+
+
+# resource "kubernetes_config_map" "jenkins_seed_job" {
+#   metadata {
+#     name      = "jenkins-seed-job"
+#     namespace = kubernetes_namespace.iac.metadata[0].name
+#   }
+#
+#   data = {
+#     "seed-job.groovy" = <<-EOT
+#       pipelineJob('hello-buddy') {
+#         definition {
+#           cpsScm {
+#             scm {
+#               git {
+#                 remote {
+#                   url('https://github.com/codegik/devops.git')
+#                 }
+#                 branch('*/master')
+#                 extensions {
+#                   relativeTargetDirectory('deployment-system/hello-buddy')
+#                 }
+#               }
+#             }
+#             scriptPath('Jenkinsfile')
+#           }
+#         }
+#       }
+#     EOT
+#   }
+# }
+
+
+
 
