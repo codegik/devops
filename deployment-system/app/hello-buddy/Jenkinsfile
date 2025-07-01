@@ -24,7 +24,7 @@ pipeline {
                         - cat
                         tty: true
                     """
-                    containerSelector 'node'
+                    defaultContainer 'node'
                 }
             }
             steps {
