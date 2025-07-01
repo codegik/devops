@@ -12,9 +12,19 @@ pipeline {
     stages {
         stage('Run Tests') {
             agent {
-                docker {
-                    image 'node:22'
-                    reuseNode true
+                kubernetes {
+                    yaml """
+                    apiVersion: v1
+                    kind: Pod
+                    spec:
+                      containers:
+                      - name: node
+                        image: node:22
+                        command:
+                        - cat
+                        tty: true
+                    """
+                    containerSelector 'node'
                 }
             }
             steps {
