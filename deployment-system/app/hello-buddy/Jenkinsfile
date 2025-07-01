@@ -34,7 +34,6 @@ pipeline {
                 sh 'npm --version'
 
                 // Debug npm configuration and network
-                sh 'env | grep -i npm'
                 sh 'cat ~/.npmrc || echo "No user npmrc"'
                 sh 'npm config list -l'
                 sh 'curl -v https://registry.npmjs.org/jquery'
