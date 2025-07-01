@@ -32,13 +32,33 @@ pipeline {
             steps {
                 sh 'node --version'
                 sh 'npm --version'
+
+                // Debug npm configuration and network
+                sh 'env | grep -i npm'
+                sh 'cat ~/.npmrc || echo "No user npmrc"'
+                sh 'npm config list -l'
+                sh 'curl -v https://registry.npmjs.org/jquery'
+
                 dir('deployment-system/app/hello-buddy') {
-                    sh 'npm cache clean --force'
-                    sh 'npm config delete registry'
-                    sh 'npm config set registry https://registry.npmjs.org/ --location=global'
-                    sh 'npm config get registry'
-                    sh 'npm install --verbose --registry=https://registry.npmjs.org/'
-                    sh 'npm test'
+                    // Create a completely fresh .npmrc file
+                    sh 'rm -f .npmrc'
+                    sh 'echo "registry=https://registry.npmjs.org/" > .npmrc'
+                    sh 'echo "always-auth=false" >> .npmrc'
+                    sh 'echo "strict-ssl=false" >> .npmrc'
+                    sh 'echo "proxy=null" >> .npmrc'
+                    sh 'echo "https-proxy=null" >> .npmrc'
+                    sh 'cat .npmrc'
+
+                    // Set environment variables to override any other config
+                    withEnv(['NPM_CONFIG_REGISTRY=https://registry.npmjs.org/',
+                             'NPM_CONFIG_PROXY=null',
+                             'NPM_CONFIG_HTTPS_PROXY=null',
+                             'npm_config_registry=https://registry.npmjs.org/',
+                             'HTTP_PROXY=',
+                             'HTTPS_PROXY=']) {
+                        sh 'npm install --verbose --no-proxy'
+                        sh 'npm test'
+                    }
                 }
             }
             post {
@@ -99,4 +119,3 @@ pipeline {
         }
     }
 }
-
