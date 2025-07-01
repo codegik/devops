@@ -1,35 +1,22 @@
 pipeline {
-    agent {
-        docker {
-            image 'node:22'
-            reuseNode true
-        }
-    }
+    agent any
 
     environment {
         APP_NAME = 'hello-buddy'
         DOCKER_REGISTRY = 'localhost:30500'
         NAMESPACE = 'app'
         HELM_CHART_PATH = './helm'
+        VERSION = "${env.BUILD_NUMBER}"
     }
 
     stages {
-        stage('Install Tools') {
-            steps {
-                sh '''
-                # Install Docker CLI
-                apt-get update
-                apt-get install -y apt-transport-https ca-certificates curl gnupg lsb-release
-                curl -fsSL https://download.docker.com/linux/debian/gpg | gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
-                echo "deb [arch=amd64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/debian $(lsb_release -cs) stable" > /etc/apt/sources.list.d/docker.list
-                apt-get update
-                apt-get install -y docker-ce-cli
-
-                # Install kubectl and helm if needed for later stages
-                '''
-            }
-        }
         stage('Run Tests') {
+            agent {
+                docker {
+                    image 'node:22'
+                    reuseNode true
+                }
+            }
             steps {
                 dir('deployment-system/app/hello-buddy') {
                     sh 'npm install'
@@ -45,21 +32,21 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                dir('app/hello-buddy') {
-                    sh "docker build -t ${DOCKER_REGISTRY}/${APP_NAME}:${BUILD_NUMBER} ."
+                dir('deployment-system/app/hello-buddy') {
+                    sh "docker build -t ${DOCKER_REGISTRY}/${APP_NAME}:${VERSION} ."
                 }
             }
         }
 
         stage('Push to Registry') {
             steps {
-                sh "docker push ${DOCKER_REGISTRY}/${APP_NAME}:${BUILD_NUMBER}"
+                sh "docker push ${DOCKER_REGISTRY}/${APP_NAME}:${VERSION}"
             }
         }
 
         stage('Update Helm Values') {
             steps {
-                dir('app/hello-buddy') {
+                dir('deployment-system/app/hello-buddy') {
                     // Update the Helm values.yaml file with the new image tag
                     sh """
                     sed -i 's|tag: .*|tag: ${BUILD_NUMBER}|g' ${HELM_CHART_PATH}/values.yaml
@@ -71,7 +58,7 @@ pipeline {
 
         stage('Deploy with Helm') {
             steps {
-                dir('app/hello-buddy') {
+                dir('deployment-system/app/hello-buddy') {
                     sh "helm upgrade --install ${APP_NAME} ${HELM_CHART_PATH} --namespace ${NAMESPACE} --create-namespace"
                 }
             }

@@ -77,7 +77,7 @@ resource "helm_release" "jenkins" {
   repository = "https://charts.jenkins.io"
   chart      = "jenkins"
   namespace  = kubernetes_namespace.iac.metadata[0].name
-  timeout    = 1800 # Increase timeout to 30 minutes
+  timeout    = 900
   set        = [
     {
       name  = "controller.serviceType"
@@ -98,6 +98,15 @@ resource "helm_release" "jenkins" {
       serviceType: NodePort
       servicePort: 8080
       nodePort: 30600
+
+      containerEnv:
+        - name: DOCKER_HOST
+          value: "unix:///var/run/docker.sock"
+
+      volumes:
+        - type: HostPath
+          hostPath: /var/run/docker.sock
+          mountPath: /var/run/docker.sock
 
       JCasC:
         configScripts:
@@ -129,7 +138,8 @@ resource "helm_release" "jenkins" {
         - workflow-aggregator:latest
         - job-dsl:latest
         - configuration-as-code:latest
-        - docker-workflow:latest
+        - kubernetes:latest
+        - kubernetes-cli:latest
     EOT
   ]
 }
