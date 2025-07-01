@@ -33,7 +33,7 @@ pipeline {
                 sh 'node --version'
                 sh 'npm --version'
                 dir('deployment-system/app/hello-buddy') {
-                    sh 'npm install'
+                    sh 'npm install --verbose'
                     sh 'npm test'
                 }
             }
