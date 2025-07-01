@@ -21,13 +21,17 @@ pipeline {
                       - name: node
                         image: node:22
                         command:
-                        - cat
-                        tty: true
+                        - sleep
+                        args:
+                        - infinity
+                        workingDir: /home/jenkins/agent
                     """
                     defaultContainer 'node'
                 }
             }
             steps {
+                sh 'node --version'
+                sh 'npm --version'
                 dir('deployment-system/app/hello-buddy') {
                     sh 'npm install'
                     sh 'npm test'
@@ -59,7 +63,7 @@ pipeline {
                 dir('deployment-system/app/hello-buddy') {
                     // Update the Helm values.yaml file with the new image tag
                     sh """
-                    sed -i 's|tag: .*|tag: ${BUILD_NUMBER}|g' ${HELM_CHART_PATH}/values.yaml
+                    sed -i 's|tag: .*|tag: ${VERSION}|g' ${HELM_CHART_PATH}/values.yaml
                     sed -i 's|repository: .*|repository: ${DOCKER_REGISTRY}/${APP_NAME}|g' ${HELM_CHART_PATH}/values.yaml
                     """
                 }
