@@ -33,8 +33,11 @@ pipeline {
                 sh 'node --version'
                 sh 'npm --version'
                 dir('deployment-system/app/hello-buddy') {
-                    sh 'npm config set registry https://registry.npmjs.org/'
-                    sh 'npm install --verbose'
+                    sh 'npm cache clean --force'
+                    sh 'npm config delete registry'
+                    sh 'npm config set registry https://registry.npmjs.org/ --location=global'
+                    sh 'npm config get registry'
+                    sh 'npm install --verbose --registry=https://registry.npmjs.org/'
                     sh 'npm test'
                 }
             }
