@@ -57,16 +57,6 @@ pipeline {
                         - sleep
                         args:
                         - infinity
-                        volumeMounts:
-                          - name: docker-config
-                            mountPath: /kaniko/.docker
-                      volumes:
-                        - name: docker-config
-                          secret:
-                            secretName: docker-registry-credentials
-                            items:
-                              - key: .dockerconfigjson
-                                path: config.json
                     """
                     defaultContainer 'kaniko'
                 }
@@ -119,4 +109,3 @@ pipeline {
         }
     }
 }
-
