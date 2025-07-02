@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         APP_NAME = 'hello-buddy'
-        DOCKER_REGISTRY = 'docker-registry.iac.svc.cluster.local:5000'
+        DOCKER_REGISTRY = 'docker-registry.default.svc.cluster.local:5000'
         NAMESPACE = 'app'
         HELM_CHART_PATH = './helm'
         VERSION = "${env.BUILD_NUMBER}"
