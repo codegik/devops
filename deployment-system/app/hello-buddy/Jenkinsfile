@@ -30,8 +30,6 @@ pipeline {
                 }
             }
             steps {
-                sh 'node --version'
-                sh 'npm --version'
                 dir('deployment-system/app/hello-buddy') {
                     sh 'npm install'
                     sh 'npm test'
@@ -44,24 +42,50 @@ pipeline {
             }
         }
 
-        stage('Build Docker Image') {
-            steps {
-                dir('deployment-system/app/hello-buddy') {
-                    sh "docker build -t ${DOCKER_REGISTRY}/${APP_NAME}:${VERSION} ."
+        stage('Build and Push with Kaniko') {
+            agent {
+                kubernetes {
+                    yaml """
+                    apiVersion: v1
+                    kind: Pod
+                    spec:
+                      containers:
+                      - name: kaniko
+                        image: gcr.io/kaniko-project/executor:debug
+                        imagePullPolicy: Always
+                        command:
+                        - sleep
+                        args:
+                        - infinity
+                        volumeMounts:
+                          - name: docker-config
+                            mountPath: /kaniko/.docker
+                      volumes:
+                        - name: docker-config
+                          secret:
+                            secretName: docker-registry-credentials
+                            items:
+                              - key: .dockerconfigjson
+                                path: config.json
+                    """
+                    defaultContainer 'kaniko'
                 }
             }
-        }
-
-        stage('Push to Registry') {
             steps {
-                sh "docker push ${DOCKER_REGISTRY}/${APP_NAME}:${VERSION}"
+                dir('deployment-system/app/hello-buddy') {
+                    sh """
+                    /kaniko/executor --context=\$(pwd) \
+                                     --destination=${DOCKER_REGISTRY}/${APP_NAME}:${VERSION} \
+                                     --insecure \
+                                     --skip-tls-verify
+                    """
+                }
             }
         }
 
         stage('Update Helm Values') {
             steps {
                 dir('deployment-system/app/hello-buddy') {
-                    // Update the Helm values.yaml file with the new image tag
                     sh """
                     sed -i 's|tag: .*|tag: ${VERSION}|g' ${HELM_CHART_PATH}/values.yaml
                     sed -i 's|repository: .*|repository: ${DOCKER_REGISTRY}/${APP_NAME}|g' ${HELM_CHART_PATH}/values.yaml
@@ -95,3 +119,4 @@ pipeline {
         }
     }
 }
+
