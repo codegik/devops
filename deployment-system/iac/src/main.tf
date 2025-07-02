@@ -10,6 +10,41 @@ resource "kubernetes_namespace" "app" {
   }
 }
 
+# Grant Jenkins permissions in the app namespace
+resource "kubernetes_role" "app_admin" {
+  metadata {
+    name      = "app-admin"
+    namespace = kubernetes_namespace.app.metadata[0].name
+  }
+
+  rule {
+    api_groups = ["*"]
+    resources  = ["*"]
+    verbs      = ["*"]
+  }
+}
+
+resource "kubernetes_role_binding" "jenkins_app_admin" {
+  metadata {
+    name      = "jenkins-app-admin"
+    namespace = kubernetes_namespace.app.metadata[0].name
+  }
+  role_ref {
+    api_group = "rbac.authorization.k8s.io"
+    kind      = "Role"
+    name      = kubernetes_role.app_admin.metadata[0].name
+  }
+  subject {
+    kind      = "ServiceAccount"
+    name      = "default"
+    namespace = "iac"
+  }
+  depends_on = [
+    kubernetes_role.app_admin,
+    kubernetes_namespace.app
+  ]
+}
+
 
 # Deploy Prometheus
 resource "helm_release" "prometheus" {
@@ -98,15 +133,6 @@ resource "helm_release" "jenkins" {
       serviceType: NodePort
       servicePort: 8080
       nodePort: 30600
-
-      containerEnv:
-        - name: DOCKER_HOST
-          value: "unix:///var/run/docker.sock"
-
-      volumes:
-        - type: HostPath
-          hostPath: /var/run/docker.sock
-          mountPath: /var/run/docker.sock
 
       JCasC:
         configScripts:

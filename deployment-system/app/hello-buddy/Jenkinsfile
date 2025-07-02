@@ -99,7 +99,7 @@ pipeline {
                     """
 
                     echo "Deploying with Helm..."
-                    sh "helm upgrade --install ${APP_NAME} ${HELM_CHART_PATH} --namespace ${NAMESPACE} --create-namespace"
+                    sh "helm upgrade --install ${APP_NAME} ${HELM_CHART_PATH} --namespace ${NAMESPACE}"
 
                     echo "Verifying deployment..."
                     sh "kubectl rollout status deployment/${APP_NAME} -n ${NAMESPACE}"
