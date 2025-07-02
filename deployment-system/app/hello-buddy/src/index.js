@@ -10,6 +10,12 @@ app.get('/', (req, res) => {
     res.send('Hello Buddy!');
 });
 
-app.listen(port, () => {
-    console.log(`Server running on http://localhost:${port}`);
-});
+// Only start the server if this file is run directly
+if (require.main === module) {
+    app.listen(port, () => {
+        console.log(`Server running on http://localhost:${port}`);
+    });
+}
+
+// Export the app for testing
+module.exports = app;
