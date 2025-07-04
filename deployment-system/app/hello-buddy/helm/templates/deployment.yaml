@@ -23,3 +23,6 @@ spec:
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
             - containerPort: {{ .Values.containerPort }}
+          env:
+            - name: BUILD_NUMBER
+              value: "{{ .Values.image.tag }}"
