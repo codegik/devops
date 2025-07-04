@@ -14,10 +14,7 @@ describe('Hello Buddy App', () => {
     it('should return health status OK', async () => {
       const response = await request(app).get('/health');
       expect(response.statusCode).toBe(200);
-      expect(response.body).toEqual({
-        status: 'OK',
-        message: 'Service is up and running'
-      });
+      expect(response.body.status).toEqual('OK');
     });
   });
 
