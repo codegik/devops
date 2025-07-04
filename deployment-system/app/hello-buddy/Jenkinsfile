@@ -67,7 +67,6 @@ pipeline {
                     sh """
                     /kaniko/executor --context=\$(pwd) \
                                      --destination=${DOCKER_REGISTRY_FOR_KANIKO}/${APP_NAME}:${VERSION} \
-                                     --build-arg BUILD_NUMBER=${VERSION} \
                                      --insecure \
                                      --skip-tls-verify
                     """
