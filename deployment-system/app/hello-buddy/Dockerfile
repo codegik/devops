@@ -9,6 +9,7 @@ RUN npm install
 COPY . .
 
 ENV NODE_ENV=production
+ENV BUILD_NUMBER=${BUILD_NUMBER:-unknown}
 
 USER node
 
