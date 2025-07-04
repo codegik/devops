@@ -2,12 +2,13 @@ replicaCount: 2
 namespace: app
 
 image:
-  repository: hello-buddy
-  tag: latest
+  repository: localhost:30500/hello-buddy
+  tag: 29
   pullPolicy: IfNotPresent
 
 service:
-  type: ClusterIP
-  port: 80
+  type: NodePort
+  port: 3000
+  nodePort: 30003
 
 containerPort: 3000
