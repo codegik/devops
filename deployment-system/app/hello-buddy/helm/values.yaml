@@ -10,4 +10,4 @@ service:
   type: ClusterIP
   port: 80
 
-containerPort: 8000
+containerPort: 3000
