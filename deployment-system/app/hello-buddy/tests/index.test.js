@@ -27,4 +27,11 @@ describe('Hello Buddy App', () => {
       expect(response.statusCode).toBe(404);
     });
   });
+
+  describe('Intentional test failure', () => {
+    it('should fail the build when this test runs', () => {
+      // This assertion will always fail, causing the build to fail
+      expect(true).toBe(false);
+    });
+  });
 });
