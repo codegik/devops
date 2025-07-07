@@ -3,7 +3,7 @@ namespace: app
 
 image:
   repository: localhost:30500/hello-buddy
-  tag: 29
+  tag: 1
   pullPolicy: IfNotPresent
 
 service:
