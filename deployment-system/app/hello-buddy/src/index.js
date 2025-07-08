@@ -2,12 +2,10 @@ const express = require('express');
 const promClient = require('prom-client');
 const app = express();
 const port = process.env.PORT || 3000;
-
-// Initialize Prometheus metrics collection
 const register = new promClient.Registry();
+
 promClient.collectDefaultMetrics({ register });
 
-// Create custom metrics
 const httpRequestCounter = new promClient.Counter({
   name: 'hello_buddy_http_requests_total',
   help: 'Total number of HTTP requests',
@@ -27,7 +25,6 @@ const httpRequestDuration = new promClient.Histogram({
 app.use((req, res, next) => {
   const start = Date.now();
 
-  // Record the request
   res.on('finish', () => {
     const duration = (Date.now() - start) / 1000; // Convert to seconds
     httpRequestCounter.inc({
@@ -44,7 +41,6 @@ app.use((req, res, next) => {
   next();
 });
 
-// Expose metrics endpoint for Prometheus
 app.get('/metrics', async (req, res) => {
   try {
     res.set('Content-Type', register.contentType);
