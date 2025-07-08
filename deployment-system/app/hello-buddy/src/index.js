@@ -44,6 +44,19 @@ app.use((req, res, next) => {
   next();
 });
 
+// Expose metrics endpoint for Prometheus
+app.get('/metrics', async (req, res) => {
+  try {
+    res.set('Content-Type', register.contentType);
+    const metrics = await register.metrics();
+    res.end(metrics);
+    console.log('Metrics endpoint accessed');
+  } catch (err) {
+    console.error('Error generating metrics:', err);
+    res.status(500).end();
+  }
+});
+
 app.get('/health', (req, res) => {
   const buildNumber = process.env.BUILD_NUMBER || 'dev';
   res.status(200).json({
@@ -55,12 +68,6 @@ app.get('/health', (req, res) => {
 
 app.get('/', (req, res) => {
   res.send('Hello Buddy!');
-});
-
-// Expose metrics endpoint for Prometheus
-app.get('/metrics', async (req, res) => {
-  res.set('Content-Type', register.contentType);
-  res.end(await register.metrics());
 });
 
 // Only start the server if this file is run directly
