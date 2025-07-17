@@ -39,12 +39,17 @@ This repository contains a Proof of Concept (POC) for a complete deployment syst
 - Node.js
 - npm
 
-## Startup the cluster
+## Startup the cluster, Build the Infrastructure and test
 ```bash
-kind create cluster --config kind-config.yaml
+./run.sh
 ```
 
-## Build the Infrastructure
+## Manually run the tests whenever you want
+```shell
+./test.sh
+```
+
+## Manually Build the Infrastructure whenever you want
 ```bash
 export OPENTOFU_ENFORCE_GPG_VALIDATION=false
 cd iac/src
@@ -106,5 +111,8 @@ The included Jenkinsfile demonstrates:
 The following command will destroy the infrastructure and the cluster:
 
 ```bash
-kind delete cluster
+./destroy.sh
 ```
+
+## Test output example
+![test.output.png](test.output.png)
