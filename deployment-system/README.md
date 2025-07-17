@@ -32,6 +32,7 @@ This repository contains a Proof of Concept (POC) for a complete deployment syst
                                              └────────────────┘
 ```
 
+
 ## Requirements
 - OpenTofu (or Terraform)
 - Kind
@@ -114,5 +115,49 @@ The following command will destroy the infrastructure and the cluster:
 ./destroy.sh
 ```
 
-## Test output example
+## Testing Infrastructure
+
+Infrastructure testing is a critical component of this POC that ensures the reliability and correctness of your deployment.
+Here's why we test infrastructure:
+
+### 🔍 **Validation & Verification**
+- **Service Availability**: Confirms that all services (Jenkins, Grafana, Prometheus, Docker Registry) are running and accessible
+- **Configuration Correctness**: Validates that services are configured with the correct ports, namespaces, and settings
+- **Network Connectivity**: Ensures services can communicate with each other and are reachable from your local machine
+
+### 🚀 **Early Problem Detection**
+- **Deployment Issues**: Catches problems immediately after infrastructure provisioning
+- **Resource Conflicts**: Identifies port conflicts, naming collisions, or resource constraints
+- **Dependencies**: Verifies that service dependencies are properly configured (e.g., Grafana can connect to Prometheus)
+
+### 📊 **Automated Quality Assurance**
+- **Consistent Validation**: Provides repeatable tests that ensure infrastructure consistency across deployments
+- **CI/CD Integration**: Can be integrated into automated pipelines to prevent broken deployments from reaching production
+- **Documentation**: Tests serve as living documentation of what should be working in your infrastructure
+
+### 🛡️ **Confidence in Deployment**
+- **Production Readiness**: Ensures your local development environment matches production expectations
+- **Rollback Decisions**: Failed tests indicate when infrastructure changes should be reverted
+- **Team Collaboration**: Provides clear feedback to team members about infrastructure health
+
+## Infrastructure Testing Features
+
+Our `test.sh` script performs **comprehensive tests**:
+
+* **Cluster Connectivity** - Verifies Kind cluster is accessible
+* **Node Health** - Ensures all Kubernetes nodes are ready
+* **Namespace Validation** - Confirms required namespaces exist
+* **Service Deployment** - Validates all Helm releases are deployed successfully
+* **Pod Status** - Checks that all pods are running properly
+* **Network Services** - Verifies services are exposed on correct NodePorts
+* **Endpoint Connectivity** - Tests HTTP accessibility of all services
+* **Security Configuration** - Validates RBAC permissions for Jenkins
+* **Credential Management** - Retrieves and validates service credentials
+* **Service Authentication** - Tests access to protected services
+* **Pipeline Configuration** - Validates Jenkins pipeline creation
+
+### Sample of test result output
+The testing script provides detailed output, indicating the success or failure of each test case.
+Below is a sample output from the test script:
+
 ![test.output.png](test.output.png)
