@@ -101,7 +101,7 @@ resource "helm_release" "docker_registry" {
     },
     {
       name  = "service.nodePort"
-      value = "30501"
+      value = "30500"
     },
     {
       name  = "persistence.enabled"
