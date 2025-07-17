@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         APP_NAME = 'hello-buddy'
-        DOCKER_REGISTRY_FOR_KANIKO = 'docker-registry.default.svc.cluster.local:5000'
+        DOCKER_REGISTRY_FOR_KANIKO = 'docker-registry.iac.svc.cluster.local:5000'
         DOCKER_REGISTRY_FOR_HELM = 'localhost:30500'
         NAMESPACE = 'app'
         HELM_CHART_PATH = './helm'
