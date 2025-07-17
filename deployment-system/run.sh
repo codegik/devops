@@ -6,7 +6,8 @@ if ! docker info > /dev/null 2>&1; then
 fi
 
 echo ">>> Docker is running, creating Kind cluster..."
-kind create cluster --config kind-config.yaml
+export OPENTOFU_ENFORCE_GPG_VALIDATION=false
+kind create cluster --config ./iac/resources/kind-config.yaml
 
 echo ""
 echo ""
