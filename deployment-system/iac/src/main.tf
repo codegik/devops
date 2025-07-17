@@ -90,7 +90,7 @@ resource "helm_release" "grafana" {
 # Deploy Docker Registry
 resource "helm_release" "docker_registry" {
   name       = "docker-registry"
-  repository = "https://charts.helm.sh/stable"
+  repository = "https://helm.twun.io"
   chart      = "docker-registry"
   namespace  = kubernetes_namespace.iac.metadata[0].name
   timeout    = 600
@@ -101,7 +101,11 @@ resource "helm_release" "docker_registry" {
     },
     {
       name  = "service.nodePort"
-      value = "30500"
+      value = "30501"
+    },
+    {
+      name  = "persistence.enabled"
+      value = "false"
     }
   ]
 }
