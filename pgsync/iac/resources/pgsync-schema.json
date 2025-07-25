@@ -1,0 +1,39 @@
+{
+  "database": "pgsync_db",
+  "index": "pgsync",
+  "nodes": [
+    {
+      "table": "users",
+      "schema": "public",
+      "columns": ["id", "name", "email", "created_at", "updated_at"],
+      "transform": {
+        "rename": {
+          "created_at": "created_timestamp",
+          "updated_at": "updated_timestamp"
+        }
+      }
+    },
+    {
+      "table": "products",
+      "schema": "public",
+      "columns": ["id", "name", "description", "price", "category_id", "created_at", "updated_at"],
+      "transform": {
+        "rename": {
+          "created_at": "created_timestamp",
+          "updated_at": "updated_timestamp"
+        }
+      }
+    },
+    {
+      "table": "categories",
+      "schema": "public",
+      "columns": ["id", "name", "description", "created_at"],
+      "transform": {
+        "rename": {
+          "created_at": "created_timestamp"
+        }
+      }
+    }
+  ]
+}
+
