@@ -1,23 +1,27 @@
-
 services:
   # PostgreSQL Database
   postgres:
     image: postgres:15
-    container_name: pgsync-postgres
+    container_name: postgres
     environment:
-      POSTGRES_DB: pgsync_db
       POSTGRES_USER: pgsync
       POSTGRES_PASSWORD: pgsync123
-      POSTGRES_ROOT_PASSWORD: postgres123
+      POSTGRES_DB: pgsync_db
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ./iac/resources/postgresql-init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./postgresql-init.sql:/docker-entrypoint-initdb.d/init.sql
+    command: >
+      postgres
+      -c wal_level=logical
+      -c max_replication_slots=10
+      -c max_wal_senders=10
+      -c track_commit_timestamp=on
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U pgsync -d pgsync_db"]
-      interval: 10s
-      timeout: 5s
+      interval: 30s
+      timeout: 10s
       retries: 5
     networks:
       - pgsync-network
@@ -25,31 +29,30 @@ services:
   # Redis (required by PGSync)
   redis:
     image: redis:7-alpine
-    container_name: pgsync-redis
+    container_name: redis
     ports:
       - "6379:6379"
     volumes:
       - redis_data:/data
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
-      interval: 10s
-      timeout: 5s
-      retries: 3
+      interval: 30s
+      timeout: 10s
+      retries: 5
     networks:
       - pgsync-network
 
-  # OpenSearch (Elasticsearch alternative)
-  opensearch:
-    image: opensearchproject/opensearch:2.11.0
-    container_name: pgsync-opensearch
+  # Elasticsearch (required by PGSync)
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.17.9
+    container_name: elasticsearch
     environment:
-      - cluster.name=opensearch-cluster
-      - node.name=opensearch-node1
+      - node.name=elasticsearch
+      - cluster.name=es-docker-cluster
       - discovery.type=single-node
       - bootstrap.memory_lock=true
-      - "OPENSEARCH_JAVA_OPTS=-Xms512m -Xmx512m"
-      - "DISABLE_INSTALL_DEMO_CONFIG=true"
-      - "DISABLE_SECURITY_PLUGIN=true"
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - xpack.security.enabled=false
     ulimits:
       memlock:
         soft: -1
@@ -59,9 +62,9 @@ services:
         hard: 65536
     ports:
       - "9200:9200"
-      - "9600:9600"
+      - "9300:9300"
     volumes:
-      - opensearch_data:/usr/share/opensearch/data
+      - elasticsearch_data:/usr/share/elasticsearch/data
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://localhost:9200/_cluster/health || exit 1"]
       interval: 30s
@@ -70,17 +73,17 @@ services:
     networks:
       - pgsync-network
 
-  # OpenSearch Dashboards
-  opensearch-dashboards:
-    image: opensearchproject/opensearch-dashboards:2.11.0
-    container_name: pgsync-dashboards
+  # Kibana (Elasticsearch UI)
+  kibana:
+    image: docker.elastic.co/kibana/kibana:7.17.9
+    container_name: kibana
     ports:
       - "5601:5601"
     environment:
-      OPENSEARCH_HOSTS: '["http://opensearch:9200"]'
-      DISABLE_SECURITY_DASHBOARDS_PLUGIN: "true"
+      ELASTICSEARCH_URL: http://elasticsearch:9200
+      ELASTICSEARCH_HOSTS: '["http://elasticsearch:9200"]'
     depends_on:
-      opensearch:
+      elasticsearch:
         condition: service_healthy
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://localhost:5601/api/status || exit 1"]
@@ -93,39 +96,43 @@ services:
   # PGSync
   pgsync:
     image: toluaina1/pgsync:latest
-    container_name: pgsync-app
+    container_name: pgsync
     environment:
       PG_USER: pgsync
       PG_PASSWORD: pgsync123
       PG_HOST: postgres
       PG_PORT: 5432
       PG_DATABASE: pgsync_db
-      ELASTICSEARCH_HOST: opensearch
+      ELASTICSEARCH_HOST: elasticsearch
       ELASTICSEARCH_PORT: 9200
-      ELASTICSEARCH_SCHEME: http
-      ELASTICSEARCH_VERIFY_CERTS: "false"
       REDIS_HOST: redis
       REDIS_PORT: 6379
-      SCHEMA: /app/schema.json
+      REDIS_DB: 0
+      SCHEMA: /config/schema.json
     ports:
       - "8080:8080"
     volumes:
-      - ./iac/resources/pgsync-schema.json:/app/schema.json:ro
+      - ./config:/config
+      - ./logs:/var/log/pgsync
     depends_on:
       postgres:
         condition: service_healthy
       redis:
         condition: service_healthy
-      opensearch:
+      elasticsearch:
         condition: service_healthy
-    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8080 || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
     networks:
       - pgsync-network
 
 volumes:
   postgres_data:
   redis_data:
-  opensearch_data:
+  elasticsearch_data:
 
 networks:
   pgsync-network:
