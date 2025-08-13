@@ -1,6 +1,0 @@
-apiVersion: v2
-name: hello-buddy
-description: A Helm chart for deploying the hello-buddy app
-type: application
-version: 0.1.0
-appVersion: "latest"

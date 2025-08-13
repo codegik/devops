@@ -78,8 +78,9 @@ Go to Jenkins and run the pipeline.
 
 Run the following commands to build and deploy the application manually.
 
+# Frontend 
 ```bash
-cd app/hello-buddy 
+cd app/backend
 ./deploy.sh <build-number>
 ```
 

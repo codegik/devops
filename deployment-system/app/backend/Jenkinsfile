@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        APP_NAME = 'hello-buddy'
+        APP_NAME = 'backend'
         DOCKER_REGISTRY_FOR_KANIKO = 'docker-registry.iac.svc.cluster.local:5000'
         DOCKER_REGISTRY_FOR_HELM = 'localhost:30500'
         NAMESPACE = 'app'
@@ -31,7 +31,7 @@ pipeline {
                 }
             }
             steps {
-                dir('deployment-system/app/hello-buddy') {
+                dir('deployment-system/app/backend') {
                     sh 'npm install'
                     sh 'npm test'
                 }
@@ -63,7 +63,7 @@ pipeline {
                 }
             }
             steps {
-                dir('deployment-system/app/hello-buddy') {
+                dir('deployment-system/app/backend') {
                     sh """
                     /kaniko/executor --context=\$(pwd) \
                                      --destination=${DOCKER_REGISTRY_FOR_KANIKO}/${APP_NAME}:${VERSION} \
@@ -93,7 +93,7 @@ pipeline {
                 }
             }
             steps {
-                dir('deployment-system/app/hello-buddy') {
+                dir('deployment-system/app/backend') {
                     sh """
                     sed -i 's|tag: .*|tag: ${VERSION}|g' ${HELM_CHART_PATH}/values.yaml
                     sed -i 's|repository: .*|repository: ${DOCKER_REGISTRY_FOR_HELM}/${APP_NAME}|g' ${HELM_CHART_PATH}/values.yaml

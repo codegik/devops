@@ -147,7 +147,7 @@ resource "helm_release" "jenkins" {
                     description('DevOps Jobs')
                   }
               - script: >
-                  pipelineJob('devops/hello-buddy') {
+                  pipelineJob('devops/backend') {
                     definition {
                       cpsScm {
                         scm {
@@ -158,7 +158,7 @@ resource "helm_release" "jenkins" {
                             branch('*/master')
                           }
                         }
-                        scriptPath('deployment-system/app/hello-buddy/Jenkinsfile')
+                        scriptPath('deployment-system/app/backend/Jenkinsfile')
                       }
                     }
                   }

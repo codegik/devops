@@ -2,7 +2,7 @@ replicaCount: 2
 namespace: app
 
 image:
-  repository: localhost:30500/hello-buddy
+  repository: localhost:30500/backend
   tag: 1
   pullPolicy: IfNotPresent
 

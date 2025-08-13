@@ -1,11 +1,11 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: hello-buddy-grafana-dashboard
+  name: backend-grafana-dashboard
   labels:
     grafana_dashboard: "true"
 data:
-  hello-buddy-dashboard.json: |-
+  backend-dashboard.json: |-
     {
       "annotations": {
         "list": [
@@ -146,7 +146,7 @@ data:
                 "uid": "prometheus"
               },
               "editorMode": "code",
-              "expr": "sum(rate(hello_buddy_http_requests_total{job=\"hello-buddy\"}[5m])) by (endpoint)",
+              "expr": "sum(rate(hello_buddy_http_requests_total{job=\"backend\"}[5m])) by (endpoint)",
               "legendFormat": "{endpoint}",
               "range": true,
               "refId": "A"
@@ -244,7 +244,7 @@ data:
                 "uid": "prometheus"
               },
               "editorMode": "code",
-              "expr": "sum(rate(hello_buddy_http_requests_total{job=\"hello-buddy\"}[5m])) by (status)",
+              "expr": "sum(rate(hello_buddy_http_requests_total{job=\"backend\"}[5m])) by (status)",
               "legendFormat": "Status {status}",
               "range": true,
               "refId": "A"
@@ -346,7 +346,7 @@ data:
                 "uid": "prometheus"
               },
               "editorMode": "code",
-              "expr": "histogram_quantile(0.5, sum(rate(hello_buddy_http_request_duration_seconds_bucket{job=\"hello-buddy\"}[5m])) by (le, endpoint))",
+              "expr": "histogram_quantile(0.5, sum(rate(hello_buddy_http_request_duration_seconds_bucket{job=\"backend\"}[5m])) by (le, endpoint))",
               "legendFormat": "P50 - {endpoint}",
               "range": true,
               "refId": "A"
@@ -357,7 +357,7 @@ data:
                 "uid": "prometheus"
               },
               "editorMode": "code",
-              "expr": "histogram_quantile(0.9, sum(rate(hello_buddy_http_request_duration_seconds_bucket{job=\"hello-buddy\"}[5m])) by (le, endpoint))",
+              "expr": "histogram_quantile(0.9, sum(rate(hello_buddy_http_request_duration_seconds_bucket{job=\"backend\"}[5m])) by (le, endpoint))",
               "hide": false,
               "legendFormat": "P90 - {endpoint}",
               "range": true,
@@ -369,7 +369,7 @@ data:
                 "uid": "prometheus"
               },
               "editorMode": "code",
-              "expr": "histogram_quantile(0.99, sum(rate(hello_buddy_http_request_duration_seconds_bucket{job=\"hello-buddy\"}[5m])) by (le, endpoint))",
+              "expr": "histogram_quantile(0.99, sum(rate(hello_buddy_http_request_duration_seconds_bucket{job=\"backend\"}[5m])) by (le, endpoint))",
               "hide": false,
               "legendFormat": "P99 - {endpoint}",
               "range": true,
@@ -429,7 +429,7 @@ data:
                 "uid": "prometheus"
               },
               "editorMode": "code",
-              "expr": "sum(hello_buddy_http_requests_total{job=\"hello-buddy\"}) by (endpoint)",
+              "expr": "sum(hello_buddy_http_requests_total{job=\"backend\"}) by (endpoint)",
               "legendFormat": "{endpoint}",
               "range": true,
               "refId": "A"
@@ -497,7 +497,7 @@ data:
                 "uid": "prometheus"
               },
               "editorMode": "code",
-              "expr": "avg(rate(process_cpu_seconds_total{job=\"hello-buddy\"}[1m])) * 100",
+              "expr": "avg(rate(process_cpu_seconds_total{job=\"backend\"}[1m])) * 100",
               "legendFormat": "__auto",
               "range": true,
               "refId": "A"
@@ -567,7 +567,7 @@ data:
                 "uid": "prometheus"
               },
               "editorMode": "code",
-              "expr": "process_resident_memory_bytes{job=\"hello-buddy\"}",
+              "expr": "process_resident_memory_bytes{job=\"backend\"}",
               "legendFormat": "__auto",
               "range": true,
               "refId": "A"
@@ -637,7 +637,7 @@ data:
                 "uid": "prometheus"
               },
               "editorMode": "code",
-              "expr": "nodejs_eventloop_lag_seconds{job=\"hello-buddy\"}",
+              "expr": "nodejs_eventloop_lag_seconds{job=\"backend\"}",
               "legendFormat": "__auto",
               "range": true,
               "refId": "A"
@@ -703,7 +703,7 @@ data:
                 "uid": "prometheus"
               },
               "editorMode": "code",
-              "expr": "sum(hello_buddy_http_requests_total{job=\"hello-buddy\"}) by (method)",
+              "expr": "sum(hello_buddy_http_requests_total{job=\"backend\"}) by (method)",
               "legendFormat": "{method}",
               "range": true,
               "refId": "A"
@@ -769,7 +769,7 @@ data:
                 "uid": "prometheus"
               },
               "editorMode": "code",
-              "expr": "sum(hello_buddy_http_requests_total{job=\"hello-buddy\"}) by (status)",
+              "expr": "sum(hello_buddy_http_requests_total{job=\"backend\"}) by (status)",
               "legendFormat": "{status}",
               "range": true,
               "refId": "A"
@@ -783,7 +783,7 @@ data:
       "schemaVersion": 37,
       "style": "dark",
       "tags": [
-        "hello-buddy",
+        "backend",
         "nodejs",
         "express"
       ],
@@ -837,7 +837,7 @@ data:
       },
       "timezone": "",
       "title": "Hello Buddy Application Dashboard",
-      "uid": "hello-buddy",
+      "uid": "backend",
       "version": 1,
       "weekStart": ""
     }

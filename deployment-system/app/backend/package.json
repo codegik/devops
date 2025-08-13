@@ -1,5 +1,5 @@
 {
-  "name": "hello-buddy",
+  "name": "backend",
   "version": "1.0.0",
   "description": "A tiny backend application with health check",
   "main": "src/index.js",
