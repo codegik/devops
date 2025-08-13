@@ -10,71 +10,66 @@ run "namespaces_exist" {
   command = plan
 
   assert {
-    condition     = kubernetes_namespace.iac.metadata[0].name == "iac"
+    condition     = resource.kubernetes_namespace.iac.metadata[0].name == "iac"
     error_message = "Namespace 'iac' is not configured correctly."
   }
 
   assert {
-    condition     = kubernetes_namespace.app.metadata[0].name == "app"
+    condition     = resource.kubernetes_namespace.app.metadata[0].name == "app"
     error_message = "Namespace 'app' is not configured correctly."
   }
 }
 
-# RBAC: Role admin in the 'app' namespace with full permissions
+# RBAC: Role 'app-admin' in 'app' with wildcard permissions
 run "rbac_role_app_admin" {
   command = plan
 
   assert {
-    condition     = kubernetes_role.app_admin.metadata[0].namespace == kubernetes_namespace.app.metadata[0].name
+    condition     = resource.kubernetes_role.app_admin.metadata[0].namespace == resource.kubernetes_namespace.app.metadata[0].name
     error_message = "Role 'app-admin' must be in the 'app' namespace."
   }
 
-  # Check that the first (and only) rule uses wildcard for apiGroups/resources/verbs
+  # At least one rule with apiGroups/resources/verbs all '*'
   assert {
-    condition     = kubernetes_role.app_admin.rule[0].api_groups[0] == "*"
-    error_message = "Role 'app-admin' must allow apiGroups='*'."
-  }
-  assert {
-    condition     = kubernetes_role.app_admin.rule[0].resources[0] == "*"
-    error_message = "Role 'app-admin' must allow resources='*'."
-  }
-  assert {
-    condition     = kubernetes_role.app_admin.rule[0].verbs[0] == "*"
-    error_message = "Role 'app-admin' must allow verbs='*'."
+    condition = anytrue([
+      for r in resource.kubernetes_role.app_admin.rule :
+      contains(r.api_groups, "*") && contains(r.resources, "*") && contains(r.verbs, "*")
+    ])
+    error_message = "Role 'app-admin' must allow apiGroups='*', resources='*', verbs='*'."
   }
 }
 
-# RBAC: RoleBinding must point to Role in 'app' and ServiceAccount 'default' in 'iac'
+# RBAC: RoleBinding points to Role in 'app' and SA 'default' in 'iac'
 run "rbac_rolebinding_jenkins_app_admin" {
   command = plan
 
   assert {
-    condition     = kubernetes_role_binding.jenkins_app_admin.metadata[0].namespace == kubernetes_namespace.app.metadata[0].name
+    condition     = resource.kubernetes_role_binding.jenkins_app_admin.metadata[0].namespace == resource.kubernetes_namespace.app.metadata[0].name
     error_message = "RoleBinding 'jenkins-app-admin' must be in the 'app' namespace."
   }
 
   assert {
-    condition     = kubernetes_role_binding.jenkins_app_admin.role_ref[0].kind == "Role"
+    condition     = resource.kubernetes_role_binding.jenkins_app_admin.role_ref[0].kind == "Role"
     error_message = "RoleBinding 'jenkins-app-admin' must have role_ref.kind='Role'."
   }
 
   assert {
-    condition     = kubernetes_role_binding.jenkins_app_admin.role_ref[0].name == kubernetes_role.app_admin.metadata[0].name
+    condition     = resource.kubernetes_role_binding.jenkins_app_admin.role_ref[0].name == resource.kubernetes_role.app_admin.metadata[0].name
     error_message = "RoleBinding 'jenkins-app-admin' must reference the Role 'app-admin'."
   }
 
   assert {
-    condition     = kubernetes_role_binding.jenkins_app_admin.subject[0].kind == "ServiceAccount"
+    condition     = resource.kubernetes_role_binding.jenkins_app_admin.subject[0].kind == "ServiceAccount"
     error_message = "RoleBinding 'jenkins-app-admin' subject must be a ServiceAccount."
   }
 
   assert {
-    condition     = kubernetes_role_binding.jenkins_app_admin.subject[0].name == "default"
+    condition     = resource.kubernetes_role_binding.jenkins_app_admin.subject[0].name == "default"
     error_message = "RoleBinding 'jenkins-app-admin' must target ServiceAccount 'default'."
   }
 
   assert {
-    condition     = kubernetes_role_binding.jenkins_app_admin.subject[0].namespace == "iac"
+    condition     = resource.kubernetes_role_binding.jenkins_app_admin.subject[0].namespace == "iac"
     error_message = "RoleBinding 'jenkins-app-admin' ServiceAccount must be in namespace 'iac'."
   }
 }
@@ -84,24 +79,29 @@ run "prometheus_release_config" {
   command = plan
 
   assert {
-    condition     = helm_release.prometheus.name == "prometheus"
+    condition     = resource.helm_release.prometheus.name == "prometheus"
     error_message = "Helm release for Prometheus must be named 'prometheus'."
   }
 
   assert {
-    condition     = helm_release.prometheus.namespace == kubernetes_namespace.iac.metadata[0].name
+    condition     = resource.helm_release.prometheus.namespace == resource.kubernetes_namespace.iac.metadata[0].name
     error_message = "Prometheus must be deployed in namespace 'iac'."
   }
 
-  # set[0] = server.service.type, set[1] = server.service.nodePort
   assert {
-    condition     = helm_release.prometheus.set[0].name == "server.service.type" && helm_release.prometheus.set[0].value == "NodePort"
-    error_message = "Prometheus must have service.type=NodePort."
+    condition = length([
+      for s in resource.helm_release.prometheus.set :
+      s if s.name == "server.service.type" && s.value == "NodePort"
+    ]) > 0
+    error_message = "Prometheus must have service.type=NodePort (server.service.type)."
   }
 
   assert {
-    condition     = helm_release.prometheus.set[1].name == "server.service.nodePort" && helm_release.prometheus.set[1].value == "30300"
-    error_message = "Prometheus must expose NodePort 30300."
+    condition = length([
+      for s in resource.helm_release.prometheus.set :
+      s if s.name == "server.service.nodePort" && s.value == "30300"
+    ]) > 0
+    error_message = "Prometheus must expose NodePort 30300 (server.service.nodePort)."
   }
 }
 
@@ -110,23 +110,28 @@ run "grafana_release_config" {
   command = plan
 
   assert {
-    condition     = helm_release.grafana.name == "grafana"
+    condition     = resource.helm_release.grafana.name == "grafana"
     error_message = "Helm release for Grafana must be named 'grafana'."
   }
 
   assert {
-    condition     = helm_release.grafana.namespace == kubernetes_namespace.iac.metadata[0].name
+    condition     = resource.helm_release.grafana.namespace == resource.kubernetes_namespace.iac.metadata[0].name
     error_message = "Grafana must be deployed in namespace 'iac'."
   }
 
-  # set[0] = service.type, set[1] = service.nodePort
   assert {
-    condition     = helm_release.grafana.set[0].name == "service.type" && helm_release.grafana.set[0].value == "NodePort"
+    condition = length([
+      for s in resource.helm_release.grafana.set :
+      s if s.name == "service.type" && s.value == "NodePort"
+    ]) > 0
     error_message = "Grafana must have service.type=NodePort."
   }
 
   assert {
-    condition     = helm_release.grafana.set[1].name == "service.nodePort" && helm_release.grafana.set[1].value == "30400"
+    condition = length([
+      for s in resource.helm_release.grafana.set :
+      s if s.name == "service.nodePort" && s.value == "30400"
+    ]) > 0
     error_message = "Grafana must expose NodePort 30400."
   }
 }
@@ -136,28 +141,36 @@ run "docker_registry_release_config" {
   command = plan
 
   assert {
-    condition     = helm_release.docker_registry.name == "docker-registry"
+    condition     = resource.helm_release.docker_registry.name == "docker-registry"
     error_message = "Helm release for Docker Registry must be named 'docker-registry'."
   }
 
   assert {
-    condition     = helm_release.docker_registry.namespace == kubernetes_namespace.iac.metadata[0].name
+    condition     = resource.helm_release.docker_registry.namespace == resource.kubernetes_namespace.iac.metadata[0].name
     error_message = "Docker Registry must be deployed in namespace 'iac'."
   }
 
-  # set[0] = service.type, set[1] = service.nodePort, set[2] = persistence.enabled
   assert {
-    condition     = helm_release.docker_registry.set[0].name == "service.type" && helm_release.docker_registry.set[0].value == "NodePort"
+    condition = length([
+      for s in resource.helm_release.docker_registry.set :
+      s if s.name == "service.type" && s.value == "NodePort"
+    ]) > 0
     error_message = "Docker Registry must have service.type=NodePort."
   }
 
   assert {
-    condition     = helm_release.docker_registry.set[1].name == "service.nodePort" && helm_release.docker_registry.set[1].value == "30500"
+    condition = length([
+      for s in resource.helm_release.docker_registry.set :
+      s if s.name == "service.nodePort" && s.value == "30500"
+    ]) > 0
     error_message = "Docker Registry must expose NodePort 30500."
   }
 
   assert {
-    condition     = helm_release.docker_registry.set[2].name == "persistence.enabled" && helm_release.docker_registry.set[2].value == "false"
+    condition = length([
+      for s in resource.helm_release.docker_registry.set :
+      s if s.name == "persistence.enabled" && s.value == "false"
+    ]) > 0
     error_message = "Docker Registry must have persistence.enabled=false."
   }
 }
@@ -167,28 +180,36 @@ run "jenkins_release_config" {
   command = plan
 
   assert {
-    condition     = helm_release.jenkins.name == "jenkins"
+    condition     = resource.helm_release.jenkins.name == "jenkins"
     error_message = "Helm release for Jenkins must be named 'jenkins'."
   }
 
   assert {
-    condition     = helm_release.jenkins.namespace == kubernetes_namespace.iac.metadata[0].name
+    condition     = resource.helm_release.jenkins.namespace == resource.kubernetes_namespace.iac.metadata[0].name
     error_message = "Jenkins must be deployed in namespace 'iac'."
   }
 
-  # set[0] = controller.serviceType, set[1] = controller.servicePort, set[2] = controller.nodePort
   assert {
-    condition     = helm_release.jenkins.set[0].name == "controller.serviceType" && helm_release.jenkins.set[0].value == "NodePort"
+    condition = length([
+      for s in resource.helm_release.jenkins.set :
+      s if s.name == "controller.serviceType" && s.value == "NodePort"
+    ]) > 0
     error_message = "Jenkins must have controller.serviceType=NodePort."
   }
 
   assert {
-    condition     = helm_release.jenkins.set[1].name == "controller.servicePort" && helm_release.jenkins.set[1].value == "8080"
+    condition = length([
+      for s in resource.helm_release.jenkins.set :
+      s if s.name == "controller.servicePort" && s.value == "8080"
+    ]) > 0
     error_message = "Jenkins must have controller.servicePort=8080."
   }
 
   assert {
-    condition     = helm_release.jenkins.set[2].name == "controller.nodePort" && helm_release.jenkins.set[2].value == "30600"
+    condition = length([
+      for s in resource.helm_release.jenkins.set :
+      s if s.name == "controller.nodePort" && s.value == "30600"
+    ]) > 0
     error_message = "Jenkins must expose NodePort 30600."
   }
 }
