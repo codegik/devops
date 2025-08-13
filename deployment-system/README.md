@@ -13,9 +13,18 @@ This repository contains a Proof of Concept (POC) for a complete deployment syst
 ## Architecture Overview
 
 ```
+
+┌─────────────────┐
+│                 │
+│   Frontend      │
+│  Hosted with    │
+│   Node.js App   │
+└─────────────────┘
+        │ 
+        ▼
 ┌─────────────────┐     ┌───────────────┐     ┌────────────────┐
 │                 │     │               │     │                │
-│  Hello Buddy    │────▶│  Prometheus   │────▶│    Grafana     │
+│    Backend      │────▶│  Prometheus   │────▶│    Grafana     │
 │  Node.js App    │     │  Metrics      │     │   Dashboards   │
 │                 │     │               │     │                │
 └─────────────────┘     └───────────────┘     └────────────────┘

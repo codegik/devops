@@ -162,6 +162,22 @@ resource "helm_release" "jenkins" {
                       }
                     }
                   }
+              - script: >
+                  pipelineJob('devops/frontend') {
+                    definition {
+                      cpsScm {
+                        scm {
+                          git {
+                            remote {
+                              url('https://github.com/codegik/devops.git')
+                            }
+                            branch('*/master')
+                          }
+                        }
+                        scriptPath('deployment-system/app/frontend/Jenkinsfile')
+                      }
+                    }
+                  }
 
       installPlugins:
         - git:latest

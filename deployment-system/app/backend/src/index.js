@@ -10,14 +10,14 @@ let nextId = 1;
 promClient.collectDefaultMetrics({ register });
 
 const httpRequestCounter = new promClient.Counter({
-  name: 'hello_buddy_http_requests_total',
+  name: 'backend_http_requests_total',
   help: 'Total number of HTTP requests',
   labelNames: ['method', 'endpoint', 'status'],
   registers: [register]
 });
 
 const httpRequestDuration = new promClient.Histogram({
-  name: 'hello_buddy_http_request_duration_seconds',
+  name: 'backend_http_request_duration_seconds',
   help: 'Duration of HTTP requests in seconds',
   labelNames: ['method', 'endpoint', 'status'],
   buckets: [0.01, 0.05, 0.1, 0.5, 1, 2, 5],

@@ -41,7 +41,7 @@ data:
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "description": "Overview of Hello Buddy application metrics",
+          "description": "Overview of Backend application metrics",
           "gridPos": {
             "h": 3,
             "w": 24,
@@ -50,7 +50,7 @@ data:
           },
           "id": 1,
           "options": {
-            "content": "# Hello Buddy Application Dashboard\nThis dashboard provides metrics and insights for the Hello Buddy application.\n\nMonitored instance: ${instance}",
+            "content": "# Backend Application Dashboard\nThis dashboard provides metrics and insights for the Backend application.\n\nMonitored instance: ${instance}",
             "mode": "markdown"
           },
           "pluginVersion": "9.3.6",
@@ -146,7 +146,7 @@ data:
                 "uid": "prometheus"
               },
               "editorMode": "code",
-              "expr": "sum(rate(hello_buddy_http_requests_total{job=\"backend\"}[5m])) by (endpoint)",
+              "expr": "sum(rate(backend_http_requests_total{job=\"backend\"}[5m])) by (endpoint)",
               "legendFormat": "{endpoint}",
               "range": true,
               "refId": "A"
@@ -244,7 +244,7 @@ data:
                 "uid": "prometheus"
               },
               "editorMode": "code",
-              "expr": "sum(rate(hello_buddy_http_requests_total{job=\"backend\"}[5m])) by (status)",
+              "expr": "sum(rate(backend_http_requests_total{job=\"backend\"}[5m])) by (status)",
               "legendFormat": "Status {status}",
               "range": true,
               "refId": "A"
@@ -346,7 +346,7 @@ data:
                 "uid": "prometheus"
               },
               "editorMode": "code",
-              "expr": "histogram_quantile(0.5, sum(rate(hello_buddy_http_request_duration_seconds_bucket{job=\"backend\"}[5m])) by (le, endpoint))",
+              "expr": "histogram_quantile(0.5, sum(rate(backend_http_request_duration_seconds_bucket{job=\"backend\"}[5m])) by (le, endpoint))",
               "legendFormat": "P50 - {endpoint}",
               "range": true,
               "refId": "A"
@@ -357,7 +357,7 @@ data:
                 "uid": "prometheus"
               },
               "editorMode": "code",
-              "expr": "histogram_quantile(0.9, sum(rate(hello_buddy_http_request_duration_seconds_bucket{job=\"backend\"}[5m])) by (le, endpoint))",
+              "expr": "histogram_quantile(0.9, sum(rate(backend_http_request_duration_seconds_bucket{job=\"backend\"}[5m])) by (le, endpoint))",
               "hide": false,
               "legendFormat": "P90 - {endpoint}",
               "range": true,
@@ -369,7 +369,7 @@ data:
                 "uid": "prometheus"
               },
               "editorMode": "code",
-              "expr": "histogram_quantile(0.99, sum(rate(hello_buddy_http_request_duration_seconds_bucket{job=\"backend\"}[5m])) by (le, endpoint))",
+              "expr": "histogram_quantile(0.99, sum(rate(backend_http_request_duration_seconds_bucket{job=\"backend\"}[5m])) by (le, endpoint))",
               "hide": false,
               "legendFormat": "P99 - {endpoint}",
               "range": true,
@@ -429,7 +429,7 @@ data:
                 "uid": "prometheus"
               },
               "editorMode": "code",
-              "expr": "sum(hello_buddy_http_requests_total{job=\"backend\"}) by (endpoint)",
+              "expr": "sum(backend_http_requests_total{job=\"backend\"}) by (endpoint)",
               "legendFormat": "{endpoint}",
               "range": true,
               "refId": "A"
@@ -703,7 +703,7 @@ data:
                 "uid": "prometheus"
               },
               "editorMode": "code",
-              "expr": "sum(hello_buddy_http_requests_total{job=\"backend\"}) by (method)",
+              "expr": "sum(backend_http_requests_total{job=\"backend\"}) by (method)",
               "legendFormat": "{method}",
               "range": true,
               "refId": "A"
@@ -769,7 +769,7 @@ data:
                 "uid": "prometheus"
               },
               "editorMode": "code",
-              "expr": "sum(hello_buddy_http_requests_total{job=\"backend\"}) by (status)",
+              "expr": "sum(backend_http_requests_total{job=\"backend\"}) by (status)",
               "legendFormat": "{status}",
               "range": true,
               "refId": "A"
@@ -799,14 +799,14 @@ data:
               "type": "prometheus",
               "uid": "prometheus"
             },
-            "definition": "label_values(hello_buddy_http_requests_total, instance)",
+            "definition": "label_values(backend_http_requests_total, instance)",
             "hide": 0,
             "includeAll": true,
             "multi": false,
             "name": "instance",
             "options": [],
             "query": {
-              "query": "label_values(hello_buddy_http_requests_total, instance)",
+              "query": "label_values(backend_http_requests_total, instance)",
               "refId": "StandardVariableQuery"
             },
             "refresh": 1,
@@ -836,7 +836,7 @@ data:
         ]
       },
       "timezone": "",
-      "title": "Hello Buddy Application Dashboard",
+      "title": "Backend Application Dashboard",
       "uid": "backend",
       "version": 1,
       "weekStart": ""
