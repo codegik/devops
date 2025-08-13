@@ -1,6 +1,9 @@
 const express = require('express');
+const cors = require('cors');
 const promClient = require('prom-client');
 const app = express();
+app.use(cors());
+app.use(express.json());
 const port = process.env.PORT || 3000;
 const register = new promClient.Registry();
 
