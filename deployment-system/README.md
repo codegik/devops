@@ -88,7 +88,8 @@ cd app/backend
 
 After deployment, you can access:
 
-- Hello Buddy application: http://localhost:3000
+- Backend application: http://localhost:3000
+- Frontend application: http://localhost:8080
 - Jenkins CI/CD: http://localhost:30600
 - Grafana dashboards: http://localhost:30400
 - Prometheus: http://localhost:30300

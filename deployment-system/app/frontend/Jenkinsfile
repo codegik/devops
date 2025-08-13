@@ -1,0 +1,122 @@
+pipeline {
+    agent any
+
+    environment {
+        APP_NAME = 'frontend'
+        DOCKER_REGISTRY_FOR_KANIKO = 'docker-registry.iac.svc.cluster.local:5000'
+        DOCKER_REGISTRY_FOR_HELM = 'localhost:30500'
+        NAMESPACE = 'app'
+        HELM_CHART_PATH = './helm'
+        VERSION = "${env.BUILD_NUMBER}"
+    }
+
+    stages {
+        stage('Run Tests') {
+            agent {
+                kubernetes {
+                    yaml """
+                    apiVersion: v1
+                    kind: Pod
+                    spec:
+                      containers:
+                      - name: node
+                        image: node:22-alpine
+                        command:
+                        - sleep
+                        args:
+                        - infinity
+                        workingDir: /home/jenkins/agent
+                    """
+                    defaultContainer 'node'
+                }
+            }
+            steps {
+                dir('deployment-system/app/frontend') {
+                    sh 'npm install'
+                    sh 'npm test -- --ci'
+                    sh 'npm run build'
+                }
+            }
+            post {
+                failure {
+                    error "Tests failed! Aborting the pipeline."
+                }
+            }
+        }
+
+        stage('Build and Push with Kaniko') {
+            agent {
+                kubernetes {
+                    yaml """
+                    apiVersion: v1
+                    kind: Pod
+                    spec:
+                      containers:
+                      - name: kaniko
+                        image: gcr.io/kaniko-project/executor:debug
+                        imagePullPolicy: Always
+                        command:
+                        - sleep
+                        args:
+                        - infinity
+                    """
+                    defaultContainer 'kaniko'
+                }
+            }
+            steps {
+                dir('deployment-system/app/frontend') {
+                    sh """
+                    /kaniko/executor --context=\$(pwd) \
+                                     --destination=${DOCKER_REGISTRY_FOR_KANIKO}/${APP_NAME}:${VERSION} \
+                                     --insecure \
+                                     --skip-tls-verify
+                    """
+                }
+            }
+        }
+
+        stage('Deploy') {
+            agent {
+                kubernetes {
+                    yaml """
+                    apiVersion: v1
+                    kind: Pod
+                    spec:
+                      containers:
+                      - name: helm-kubectl
+                        image: dtzar/helm-kubectl:latest
+                        command:
+                        - sleep
+                        args:
+                        - infinity
+                    """
+                    defaultContainer 'helm-kubectl'
+                }
+            }
+            steps {
+                dir('deployment-system/app/frontend') {
+                    sh """
+                    sed -i 's|tag: .*|tag: ${VERSION}|g' ${HELM_CHART_PATH}/values.yaml
+                    sed -i 's|repository: .*|repository: ${DOCKER_REGISTRY_FOR_HELM}/${APP_NAME}|g' ${HELM_CHART_PATH}/values.yaml
+                    """
+
+                    echo "Deploying with Helm..."
+                    sh "helm upgrade --install ${APP_NAME} ${HELM_CHART_PATH} --namespace ${NAMESPACE}"
+
+                    echo "Verifying deployment..."
+                    sh "kubectl rollout status deployment/${APP_NAME} -n ${NAMESPACE}"
+                    sh "kubectl get pods -l app=${APP_NAME} -n ${NAMESPACE}"
+                }
+            }
+        }
+    }
+
+    post {
+        success {
+            echo "Deployment of ${APP_NAME} completed successfully!"
+        }
+        failure {
+            echo "Deployment of ${APP_NAME} failed!"
+        }
+    }
+}
