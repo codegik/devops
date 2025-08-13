@@ -1,5 +1,5 @@
 
-const BASE_URL = `http://${process.env.REACT_APP_HOST || 'localhost'}:${process.env.REACT_APP_API_PORT || 8080}`;
+const BASE_URL = `http://${process.env.BACKEND_HOST || 'localhost'}:${process.env.BACKEND_PORT || 3000}`;
 
 
 const DEFAULT_TIMEOUT = 10000; // ms
