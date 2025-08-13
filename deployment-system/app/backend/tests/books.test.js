@@ -1,5 +1,5 @@
 const request = require('supertest');
-const app = require('./index');
+const app = require('../src/index');
 
 describe('Books API', () => {
   it('should return empty list initially', async () => {
