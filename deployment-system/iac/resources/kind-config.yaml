@@ -15,6 +15,9 @@ nodes:
   - containerPort: 30600 # Jenkins
     hostPort: 30600
     protocol: TCP
-  - containerPort: 30003 # Hello-buddy (maps to app port 3000)
+  - containerPort: 30003 # Backend (maps to app port 3000)
     hostPort: 3000
+    protocol: TCP
+  - containerPort: 30004 # Frontend (maps to app port 8080)
+    hostPort: 8080
     protocol: TCP

@@ -1,5 +1,5 @@
 {
-  "name": "hello-buddy",
+  "name": "backend",
   "version": "1.0.0",
   "description": "A tiny backend application with health check",
   "main": "src/index.js",
@@ -8,6 +8,7 @@
     "test": "jest"
   },
   "dependencies": {
+    "cors": "^2.8.5",
     "express": "^4.18.2",
     "prom-client": "^14.2.0"
   },

@@ -188,8 +188,8 @@ else
     track_test false
 fi
 
-# Test 11: Validate Jenkins hello-buddy pipeline exists
-print_status $YELLOW "11. Checking if Jenkins hello-buddy pipeline is created..."
+# Test 11: Validate Jenkins backend pipeline exists
+print_status $YELLOW "11. Checking if Jenkins backend pipeline is created..."
 
 # Get Jenkins admin credentials
 JENKINS_USER=$(kubectl get secret jenkins -n iac -o jsonpath="{.data.jenkins-admin-user}" | base64 --decode 2>/dev/null)
@@ -201,13 +201,13 @@ if [ ! -z "$JENKINS_USER" ] && [ ! -z "$JENKINS_PASSWORD_PIPELINE" ]; then
 
     # First check if Jenkins is responding
     if curl -s --connect-timeout 10 --max-time 30 "$JENKINS_URL/login" > /dev/null 2>&1; then
-        # Check if the devops/hello-buddy pipeline exists
+        # Check if the devops/backend pipeline exists
         PIPELINE_CHECK=$(curl -s --connect-timeout 10 --max-time 30 \
             -u "$JENKINS_USER:$JENKINS_PASSWORD_PIPELINE" \
-            "$JENKINS_URL/job/devops/job/hello-buddy/api/json" 2>/dev/null)
+            "$JENKINS_URL/job/devops/job/backend/api/json" 2>/dev/null)
 
-        if echo "$PIPELINE_CHECK" | grep -q '"name":"hello-buddy"'; then
-            print_status $GREEN "✅ Jenkins hello-buddy pipeline exists in devops folder"
+        if echo "$PIPELINE_CHECK" | grep -q '"name":"backend"'; then
+            print_status $GREEN "✅ Jenkins backend pipeline exists in devops folder"
             track_test true
         else
             # Check if devops folder exists
@@ -216,7 +216,7 @@ if [ ! -z "$JENKINS_USER" ] && [ ! -z "$JENKINS_PASSWORD_PIPELINE" ]; then
                 "$JENKINS_URL/job/devops/api/json" 2>/dev/null)
 
             if echo "$DEVOPS_FOLDER_CHECK" | grep -q '"name":"devops"'; then
-                print_status $RED "❌ Jenkins devops folder exists but hello-buddy pipeline not found"
+                print_status $RED "❌ Jenkins devops folder exists but backend pipeline not found"
                 echo "   Available jobs in devops folder:"
                 echo "$DEVOPS_FOLDER_CHECK" | grep -o '"name":"[^"]*"' | head -5
             else

@@ -13,9 +13,18 @@ This repository contains a Proof of Concept (POC) for a complete deployment syst
 ## Architecture Overview
 
 ```
+
+┌─────────────────┐
+│                 │
+│   Frontend      │
+│  Hosted with    │
+│   Node.js App   │
+└─────────────────┘
+        │ 
+        ▼
 ┌─────────────────┐     ┌───────────────┐     ┌────────────────┐
 │                 │     │               │     │                │
-│  Hello Buddy    │────▶│  Prometheus   │────▶│    Grafana     │
+│    Backend      │────▶│  Prometheus   │────▶│    Grafana     │
 │  Node.js App    │     │  Metrics      │     │   Dashboards   │
 │                 │     │               │     │                │
 └─────────────────┘     └───────────────┘     └────────────────┘
@@ -78,8 +87,9 @@ Go to Jenkins and run the pipeline.
 
 Run the following commands to build and deploy the application manually.
 
+# Frontend 
 ```bash
-cd app/hello-buddy 
+cd app/backend
 ./deploy.sh <build-number>
 ```
 
@@ -87,7 +97,8 @@ cd app/hello-buddy
 
 After deployment, you can access:
 
-- Hello Buddy application: http://localhost:3000
+- Backend application: http://localhost:3000
+- Frontend application: http://localhost:8080
 - Jenkins CI/CD: http://localhost:30600
 - Grafana dashboards: http://localhost:30400
 - Prometheus: http://localhost:30300

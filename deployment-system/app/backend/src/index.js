@@ -1,20 +1,26 @@
 const express = require('express');
+const cors = require('cors');
 const promClient = require('prom-client');
 const app = express();
+app.use(cors());
+app.use(express.json());
 const port = process.env.PORT || 3000;
 const register = new promClient.Registry();
+
+let books = [];
+let nextId = 1;
 
 promClient.collectDefaultMetrics({ register });
 
 const httpRequestCounter = new promClient.Counter({
-  name: 'hello_buddy_http_requests_total',
+  name: 'backend_http_requests_total',
   help: 'Total number of HTTP requests',
   labelNames: ['method', 'endpoint', 'status'],
   registers: [register]
 });
 
 const httpRequestDuration = new promClient.Histogram({
-  name: 'hello_buddy_http_request_duration_seconds',
+  name: 'backend_http_request_duration_seconds',
   help: 'Duration of HTTP requests in seconds',
   labelNames: ['method', 'endpoint', 'status'],
   buckets: [0.01, 0.05, 0.1, 0.5, 1, 2, 5],
@@ -65,6 +71,58 @@ app.get('/health', (req, res) => {
 app.get('/', (req, res) => {
   res.send('Hello Buddy!');
 });
+
+
+// Get all books
+app.get('/books', (req, res) => {
+  res.json(books);
+});
+
+// Get a book by id
+app.get('/books/:id', (req, res) => {
+  const id = parseInt(req.params.id, 10);
+  const book = books.find(b => b.id === id);
+  if (!book) {
+    return res.status(404).json({ error: 'Book not found' });
+  }
+  res.json(book);
+});
+
+// Create a new book
+app.post('/books', (req, res) => {
+  const { title, author } = req.body;
+  if (!title) {
+    return res.status(400).json({ error: 'Title is required' });
+  }
+  const book = { id: nextId++, title, author };
+  books.push(book);
+  res.status(201).json(book);
+});
+
+// Update a book
+app.put('/books/:id', (req, res) => {
+  const id = parseInt(req.params.id, 10);
+  const book = books.find(b => b.id === id);
+  if (!book) {
+    return res.status(404).json({ error: 'Book not found' });
+  }
+  const { title, author } = req.body;
+  if (title !== undefined) book.title = title;
+  if (author !== undefined) book.author = author;
+  res.json(book);
+});
+
+// Delete a book
+app.delete('/books/:id', (req, res) => {
+  const id = parseInt(req.params.id, 10);
+  const index = books.findIndex(b => b.id === id);
+  if (index === -1) {
+    return res.status(404).json({ error: 'Book not found' });
+  }
+  books.splice(index, 1);
+  res.status(204).send();
+});
+
 
 // Only start the server if this file is run directly
 if (require.main === module) {

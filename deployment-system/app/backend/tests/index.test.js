@@ -1,7 +1,7 @@
 const request = require('supertest');
 const app = require('../src/index');
 
-describe('Hello Buddy App', () => {
+describe('Backend App', () => {
   describe('GET /', () => {
     it('should return "Hello Buddy!" message', async () => {
       const response = await request(app).get('/');
