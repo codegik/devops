@@ -1,5 +1,7 @@
 #!/bin/sh
 
+set -e
+
 if ! docker info > /dev/null 2>&1; then
   echo ">>> Error: Docker is not running. Please start Docker and try again."
   exit 1
