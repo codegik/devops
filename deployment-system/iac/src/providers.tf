@@ -17,7 +17,6 @@ terraform {
 
 provider "kind" {}
 
-
 provider "kubernetes" {
   host                   = kind_cluster.default.endpoint
   client_certificate     = kind_cluster.default.client_certificate
