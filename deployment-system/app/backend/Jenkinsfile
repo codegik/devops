@@ -43,8 +43,6 @@ pipeline {
             }
         }
 
-        // Kaniko is used in this Jenkinsfile because it's specifically designed for building container images
-        // in containerized environments like Kubernetes pods without requiring Docker daemon access.
         stage('Build and Push with Kaniko') {
             agent {
                 kubernetes {
