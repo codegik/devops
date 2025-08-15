@@ -5,15 +5,13 @@ if ! docker info > /dev/null 2>&1; then
   exit 1
 fi
 
-echo ">>> Docker is running, creating Kind cluster..."
+echo ">>> Docker is running, creating infrastructure with OpenTofu..."
 export OPENTOFU_ENFORCE_GPG_VALIDATION=false
-kind create cluster --config ./iac/resources/kind-config.yaml
 
 echo ""
 echo ""
-echo ">>> Creating infrastructure..."
+echo ">>> Creating infrastructure (including Kind cluster)..."
 cd iac/src
-rm -rf .terraform .terraform.lock.hcl terraform.*
 tofu init
 tofu apply -auto-approve
 cd -
