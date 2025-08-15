@@ -41,6 +41,7 @@ This repository contains a Proof of Concept (POC) for a complete deployment syst
                                              └────────────────┘
 ```
 
+![System Architecture Diagram](deployment-system-diagram.png)
 
 ## Requirements
 - OpenTofu (or Terraform)

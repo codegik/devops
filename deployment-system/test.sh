@@ -253,3 +253,7 @@ if [ $TOTAL_TESTS -gt 0 ]; then
     print_status $BLUE "Success Rate: ${SUCCESS_RATE}%"
 fi
 
+print_status $YELLOW "Now running tofu tests..."
+cd iac/src
+tofu test
+cd -
