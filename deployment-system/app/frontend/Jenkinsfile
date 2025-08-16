@@ -1,6 +1,24 @@
 pipeline {
     agent any
 
+    parameters {
+        string(name: 'BRANCH', defaultValue: 'master', description: 'Git branch to deploy')
+    }
+
+    stage('Checkout') {
+        steps {
+            // Clear workspace first
+            deleteDir()
+            
+            // Checkout and show details
+            git branch: params.BRANCH, url: 'https://github.com/codegik/devops'
+            
+            // Show git information
+            sh 'git branch -a'
+            sh 'git log --oneline -5'
+        }
+    }
+
     environment {
         APP_NAME = 'frontend'
         DOCKER_REGISTRY_FOR_KANIKO = 'docker-registry.iac.svc.cluster.local:5000'
@@ -31,6 +49,8 @@ pipeline {
                 }
             }
             steps {
+                git branch: params.BRANCH, url: 'https://github.com/codegik/devops'
+
                 dir('deployment-system/app/frontend') {
                     sh 'npm install'
                     sh 'npm test -- --ci'
@@ -64,6 +84,8 @@ pipeline {
                 }
             }
             steps {
+                git branch: params.BRANCH, url: 'https://github.com/codegik/devops'
+
                 dir('deployment-system/app/frontend') {
                     sh """
                     /kaniko/executor --context=\$(pwd) \
@@ -94,6 +116,8 @@ pipeline {
                 }
             }
             steps {
+                git branch: params.BRANCH, url: 'https://github.com/codegik/devops'
+                
                 dir('deployment-system/app/frontend') {
                     sh """
                     sed -i 's|tag: .*|tag: ${VERSION}|g' ${HELM_CHART_PATH}/values.yaml
