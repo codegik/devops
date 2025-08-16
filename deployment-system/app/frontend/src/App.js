@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from 'react';
-import BookList from './BookList';
-import BookForm from './BookForm';
-import { booksApi } from './api/books';
-import './styles.css';
+import React, { useEffect, useState } from "react";
+import BookList from "./BookList";
+import BookForm from "./BookForm";
+import { booksApi } from "./api/books";
+import "./styles.css";
 
 export default function App() {
   const [books, setBooks] = useState([]);
@@ -43,7 +43,9 @@ export default function App() {
   return (
     <div className="min-h-screen bg-gray-100 p-6">
       <div className="max-w-2xl mx-auto bg-white rounded-xl shadow-md p-6 space-y-6">
-        <h1 className="text-3xl font-bold text-gray-800 text-center">📚 Book Manager</h1>
+        <h1 className="text-3xl font-bold text-gray-800 text-center">
+          📚 Library Manager
+        </h1>
 
         {error && (
           <div className="rounded-md bg-red-50 p-3 text-red-700 text-sm">
@@ -52,7 +54,9 @@ export default function App() {
         )}
 
         <BookForm
-          onSubmit={editing ? (data) => handleUpdate(editing.id, data) : handleCreate}
+          onSubmit={
+            editing ? (data) => handleUpdate(editing.id, data) : handleCreate
+          }
           initialData={editing}
         />
 
