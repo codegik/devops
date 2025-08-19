@@ -1,0 +1,48 @@
+[
+  {
+    "database": "pgsync_db",
+    "index": "categories",
+    "nodes": {
+      "table": "categories",
+      "columns": [
+        "id",
+        "name",
+        "description",
+        "created_at",
+        "updated_at"
+      ]
+    }
+  },
+  {
+    "database": "pgsync_db",
+    "index": "products",
+    "nodes": {
+      "table": "products",
+      "columns": [
+        "id",
+        "name",
+        "description",
+        "price",
+        "category_id",
+        "stock_quantity",
+        "is_active",
+        "created_at",
+        "updated_at"
+      ],
+      "children": [
+        {
+          "table": "categories",
+          "columns": [
+            "name as category_name",
+            "description as category_description"
+          ],
+          "relationship": {
+            "variant": "object",
+            "type": "one_to_one"
+          }
+        }
+      ]
+    }
+  }
+]
+
